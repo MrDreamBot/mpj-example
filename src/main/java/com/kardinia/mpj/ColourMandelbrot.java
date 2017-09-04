@@ -50,7 +50,11 @@ public class ColourMandelbrot {
     public static void main(String[] args) throws IOException  {
         
 		// initialise and get program parameters
-	    String params[] = MPI.Init(args); 
+	    String params[] = MPI.Init(args);
+	    if (params.length < 4) {
+			MPI.Finalize();
+			throw new RuntimeException("Insufficient number of arguments: " + params.length);
+		}
 	    int numberOfProcessors = MPI.COMM_WORLD.Size(); 
 	    int myId = MPI.COMM_WORLD.Rank();
 	    
@@ -127,7 +131,9 @@ public class ColourMandelbrot {
             			MPI.COMM_WORLD.Recv(dots, 0, HEIGHT, MPI.INT, j, DOTS_TAG);
             		}
             		for (int k = 0; k < HEIGHT; k++) {
-            			pic.set(i + j, HEIGHT-1-k, colours[dots[k]]);
+            			if (i + j < WIDTH) {
+            				pic.set(i + j, HEIGHT-1-k, colours[dots[k]]);
+            			}
             		}
             	}
             }
